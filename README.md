@@ -1,5 +1,10 @@
 # Point-Then-Operate
-This repository contains PyTorch implementations of the ACL2019 paper `A Hierarchical Reinforced Sequence Operation Method for Unsupervised Text Style Transfer`.
+This repository contains PyTorch implementations of the ACL2019 paper "A Hierarchical Reinforced Sequence Operation Method for Unsupervised Text Style Transfer". [[paper]](https://www.aclweb.org/anthology/P19-1482) | [[slides]](static/ACL_2019_PTO_Slides.pdf)
+
+<p align="center">
+    <img src="static/Example.png" height="200" /> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <img src="static/PTO.png" height="200" />
+</p> 
 
 ## Overview
 * `data/yelp/` and `data/amazon/` are placeholder directories for the Yelp and the Amazon datasets, respectively
@@ -10,8 +15,10 @@ This repository contains PyTorch implementations of the ACL2019 paper `A Hierarc
 
 ## Dependencies
 * Python 3.6.5
-* Versions of all depending libraries are specified in `requirements.txt`. To reproduce the reported results, please make sure that the specified versions are installed
+* Versions of all depending libraries are specified in `requirements.txt`. To reproduce the reported results, please make sure that the specified versions are installed. **Update 28/08/2019**: We receive a security vulnerability alert for the specified version of `nltk` from GitHub.
 * System outputs are evaluated based on the Moses BLEU script [multi-bleu.perl](https://github.com/moses-smt/mosesdecoder/blob/master/scripts/generic/multi-bleu.perl). Download the script and put it into `PTO-{yelp, amazon}/utils/`
+* Run on a single NVIDIA GeForce GTX 1080 Ti
+* CUDA 10.0
 
 ## Usage
 ### Test with Pre-Trained Models
@@ -23,13 +30,13 @@ This repository contains PyTorch implementations of the ACL2019 paper `A Hierarc
     - Non-aligned text files for both styles: `sentiment.{train, dev, test}.{0, 1}`. Place them in `data/{yelp, amazon}/`
     - Human written references for the test split: `reference.{0, 1}`. Place them in `data/{yelp, amazon}/`
 * Download pre-trained models from [Yelp pre-trained](https://drive.google.com/open?id=1Po31UZEnKLaYt5JP3fLzNr5JZWKwLLmK) and [Amazon pre-trained](https://drive.google.com/open?id=197JPnfLUN-C9AzntmUrR_zUvcjvO8ArJ), which include
-    - Pointer, operators, and the additional classifier: eight `.ckpt` files in total. Place them in `PTO-{yelp, amazon}/pretrained/`
+    - Pointer, operators, and the additional classifier: ten `.ckpt` files in total. Place them in `PTO-{yelp, amazon}/pretrained/`
 * Run `python3 test.py` in `PTO-{yelp, amazon}/`
 * Evaluation results, i.e., classification accuracy and BLEU score, are printed on the screen, which should be exactly the same as those reported in the paper.
 * System outputs are saved under `PTO-{yelp, amazon}/outputs/sampled_results/`, which include
     - Negative to positive outputs: `sentiment.test.0.ours`
     - Positive to negative outputs: `sentiment.test.1.ours`
-* Reminder: `reference.{0, 1}` aligns each test sample to its human reference. However, the order of sentences in `reference.{0, 1}` is not consistent with that in `sentiment.test.{0, 1}`. We fix it in `PTO-amazon/dataloaders/amazon.py`. Take care if you are using the Amazon dataset for your own project
+* Reminder: `reference.{0, 1}` aligns each test sample to its human reference. However, for the Amazon dataset, the order of sentences in `reference.{0, 1}` is not consistent with that in `sentiment.test.{0, 1}`. We fix it in `PTO-amazon/dataloaders/amazon.py`. Take care if you are using the Amazon dataset for your own project
 
 ### Train the Models
 * Train language models (optional and *not* recommended since they are only used as extrinsic rewards)
@@ -48,6 +55,22 @@ This repository contains PyTorch implementations of the ACL2019 paper `A Hierarc
     - Move the pre-trained pointer and the additional classifier, along with their embeddings, from `PTO-{yelp, amazon}/outputs/saved_models` to `PTO-{yelp, amazon}/pretrained/` and modify their prefixes from `best-` to `pretrained-`
     - Set the flag `self.train_mode` in `PTO-{yelp, amazon}/config.py` as `pto`
     - Run `python3 train.py` in `PTO-{yelp, amazon}/`
+
+## Citation
+Please cite our ACL paper if this repository inspired your work.
+```
+@inproceedings{WuRLS19,
+  author    = {Chen Wu and
+               Xuancheng Ren and
+               Fuli Luo and
+               Xu Sun},
+  title     = {A Hierarchical Reinforced Sequence Operation Method for Unsupervised Text Style Transfer},
+  booktitle = {Proceedings of the 57th Conference of the Association for Computational Linguistics, {ACL} 2019, Florence, Italy, July 28- August 2, 2019, Volume 1: Long Papers},
+  pages     = {4873--4883},
+  year      = {2019},
+  url       = {https://www.aclweb.org/anthology/P19-1482/}
+}
+```
     
 ## Contact
 * If you have any questions regarding the code, please create an issue or contact the [owner](https://github.com/ChenWu98) of this repository
